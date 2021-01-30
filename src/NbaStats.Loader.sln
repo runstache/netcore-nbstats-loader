@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbaStats.Loader", "NbaStats.Loader\NbaStats.Loader.csproj", "{63D9D68E-0CD2-47F2-AE59-6AFC32778991}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NbaStats.Loader", "NbaStats.Loader\NbaStats.Loader.csproj", "{63D9D68E-0CD2-47F2-AE59-6AFC32778991}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbaStats.Loader.Tests", "NbaStats.Loader.Tests\NbaStats.Loader.Tests.csproj", "{C473C575-051B-4F1B-BF99-6F7157EE5E6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{63D9D68E-0CD2-47F2-AE59-6AFC32778991}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63D9D68E-0CD2-47F2-AE59-6AFC32778991}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63D9D68E-0CD2-47F2-AE59-6AFC32778991}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C473C575-051B-4F1B-BF99-6F7157EE5E6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C473C575-051B-4F1B-BF99-6F7157EE5E6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C473C575-051B-4F1B-BF99-6F7157EE5E6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C473C575-051B-4F1B-BF99-6F7157EE5E6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
