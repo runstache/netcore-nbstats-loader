@@ -12,5 +12,16 @@ namespace NbaStats.Loader.DataObject
 
         [JsonProperty(PropertyName = "value")]
         public string Value { get; set; }
+
+        public StatEntry()
+        {
+
+        }
+
+        public StatEntry(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
     }
 }

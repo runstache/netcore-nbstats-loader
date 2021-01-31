@@ -30,5 +30,10 @@ namespace NbaStats.Loader.DataObject
             Stats = new List<StatEntry>();
         }
 
+        public void AddStat(StatEntry entry)
+        {
+            Stats.Add(entry);
+        }
+
     }
 }

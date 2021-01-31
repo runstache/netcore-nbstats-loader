@@ -23,5 +23,10 @@ namespace NbaStats.Loader.DataObject
         {
             LineScores = new List<LineScore>();
         }
+
+        public void AddLineScore(LineScore score)
+        {
+            LineScores.Add(score);
+        }
     }
 }
