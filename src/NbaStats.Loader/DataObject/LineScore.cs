@@ -8,17 +8,17 @@ namespace NbaStats.Loader.DataObject
     public class LineScore
     {
         [JsonProperty(PropertyName = "quarter")]
-        public string Quarter { get; set; }
+        public int Quarter { get; set; }
 
         [JsonProperty(PropertyName = "score")]
-        public string Score { get; set; }
+        public int Score { get; set; }
 
         public LineScore()
         {
 
         }
 
-        public LineScore(string quarter, string score)
+        public LineScore(int quarter, int score)
         {
             Quarter = quarter;
             Score = score;
