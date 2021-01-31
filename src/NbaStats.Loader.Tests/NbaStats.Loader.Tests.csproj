@@ -16,8 +16,4 @@
     <ProjectReference Include="..\NbaStats.Loader\NbaStats.Loader.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Transformers\" />
-  </ItemGroup>
-
 </Project>
