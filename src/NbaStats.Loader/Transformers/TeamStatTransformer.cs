@@ -11,9 +11,9 @@ namespace NbaStats.Loader.Transformers
 {
     public class TeamStatTransformer
     {
-        public Data.DataObjects.TeamStat Transform(DataObject.TeamStat entry)
+        public Data.DataObjects.TeamStat Transform(TeamStatCollection entry)
         {
-            var stat = new Data.DataObjects.TeamStat()
+            var stat = new TeamStat()
             {
                 Assits = DataTypeHelper.ConvertToInteger(GetStatValue(entry.Stats, TeamStatConstants.Assists)),
                 Blocks = DataTypeHelper.ConvertToInteger(GetStatValue(entry.Stats, TeamStatConstants.Blocks)),

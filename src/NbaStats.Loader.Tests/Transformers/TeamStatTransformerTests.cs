@@ -12,13 +12,13 @@ namespace NbaStats.Loader.Tests.Transformers
     public class TeamStatTransformerTests
     {
         private TeamStatTransformer transformer;
-        private TeamStat stat;
+        private TeamStatCollection stat;
 
         [SetUp]
         public void Setup()
         {
             transformer = new TeamStatTransformer();
-            stat = new TeamStat()
+            stat = new TeamStatCollection()
             {
                 Type = "home"
             };

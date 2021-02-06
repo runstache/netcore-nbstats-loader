@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace NbaStats.Loader.DataObject
 {
-    public class TeamStat
+    public class TeamStatCollection
     {
         [JsonProperty(PropertyName = "type")]
         public string Type { get; set; }
@@ -13,7 +13,7 @@ namespace NbaStats.Loader.DataObject
         [JsonProperty(PropertyName = "stats")]
         public List<TeamStatEntry> Stats { get; set; }
 
-        public TeamStat()
+        public TeamStatCollection()
         {
             Stats = new List<TeamStatEntry>();
         }
