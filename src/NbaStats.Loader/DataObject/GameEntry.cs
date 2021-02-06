@@ -20,6 +20,6 @@ namespace NbaStats.Loader.DataObject
         public List<PlayerEntry> HomePlayers { get; set; }
 
         [JsonProperty(PropertyName = "teams")]
-        public List<TeamStat> TeamStats { get; set; }
+        public List<TeamStatCollection> TeamStats { get; set; }
     }
 }
