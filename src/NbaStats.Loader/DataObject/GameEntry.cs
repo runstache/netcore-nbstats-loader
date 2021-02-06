@@ -21,5 +21,14 @@ namespace NbaStats.Loader.DataObject
 
         [JsonProperty(PropertyName = "teams")]
         public List<TeamStatCollection> TeamStats { get; set; }
+
+        public GameEntry()
+        {
+            TeamStats = new List<TeamStatCollection>();
+            HomePlayers = new List<PlayerEntry>();
+            AwayPlayers = new List<PlayerEntry>();
+            Game = new GameInfo();
+
+        }
     }
 }
