@@ -67,5 +67,13 @@ namespace NbaStats.Loader.Tests.Transformers
             Assert.AreEqual(39, result.ThreeTaken);
             Assert.AreEqual(19, result.TurnOvers);            
         }
+
+        [Test]
+        public void TestTransformNull()
+        {
+            var result = transformer.Transform(null);
+            Assert.IsNull(result);
+
+        }
     }
 }

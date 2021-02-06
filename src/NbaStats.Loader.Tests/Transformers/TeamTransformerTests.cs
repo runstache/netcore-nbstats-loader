@@ -55,5 +55,19 @@ namespace NbaStats.Loader.Tests.Transformers
 
         }
 
+        [Test]
+        public void TestTransformNull()
+        {
+            var result = transformer.Transform(null);
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void TestTransformNullBoxscore()
+        {
+            var result = transformer.TransformBoxScore(null);
+            Assert.IsNull(result);
+        }
+
     }
 }

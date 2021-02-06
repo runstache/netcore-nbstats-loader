@@ -114,60 +114,63 @@ namespace NbaStats.Loader.Processors
         {
             foreach (PlayerEntry playerEntry in players)
             {
-                var player = playerTransformer.Transform(playerEntry);
-                if (player != null)
+                if (!string.IsNullOrEmpty(playerEntry.FullName))
                 {
-                    // Add the Player
-                    player = playerEngine.Save(player);
+                    var player = playerTransformer.Transform(playerEntry);
                     if (player != null)
                     {
-                        // Check for other team roster
-                        if (rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).Count() > 0)
+                        // Add the Player
+                        player = playerEngine.Save(player);
+                        if (player != null)
                         {
-                            logger.LogInformation($"Player {player.PlayerName} has moved teams.  Adding Transaction.");
-                            List<RosterEntry> entries = rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).ToList();
-                            foreach (RosterEntry entry in entries)
+                            // Check for other team roster
+                            if (rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).Count() > 0)
                             {
-                                // Add a Transaction
-                                Transaction transaction = new Transaction()
+                                logger.LogInformation($"Player {player.PlayerName} has moved teams.  Adding Transaction.");
+                                List<RosterEntry> entries = rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).ToList();
+                                foreach (RosterEntry entry in entries)
                                 {
-                                    NewTeamId = teamId,
-                                    PlayerId = player.Id,
-                                    OldTeamId = entry.TeamId
-                                };
-                                transactionEngine.Save(transaction);
+                                    // Add a Transaction
+                                    Transaction transaction = new Transaction()
+                                    {
+                                        NewTeamId = teamId,
+                                        PlayerId = player.Id,
+                                        OldTeamId = entry.TeamId
+                                    };
+                                    transactionEngine.Save(transaction);
 
-                                // Remove the Entry
-                                rosterEngine.Delete(entry);
+                                    // Remove the Entry
+                                    rosterEngine.Delete(entry);
+                                }
+                            }
+                            logger.LogInformation($"Adding player {player.PlayerName} to Team Roster");
+                            // Add to the Roster
+                            RosterEntry rosterEntry = new RosterEntry()
+                            {
+                                PlayerId = player.Id,
+                                TeamId = teamId
+                            };
+                            rosterEngine.Save(rosterEntry);
+
+                            logger.LogInformation($"Adding Player Stats for {player.PlayerName} to Database");
+                            // Add Player Stats
+                            var stat = playerTransformer.TransformStat(playerEntry);
+                            if (stat != null)
+                            {
+                                stat.PlayerId = player.Id;
+                                stat.ScheduleId = scheduleId;
+                                playerStatEngine.Save(stat);
+                            }
+                            else
+                            {
+                                logger.LogInformation($"{player.PlayerName} did not play");
                             }
                         }
-                        logger.LogInformation($"Adding player {player.PlayerName} to Team Roster");
-                        // Add to the Roster
-                        RosterEntry rosterEntry = new RosterEntry()
-                        {
-                            PlayerId = player.Id,
-                            TeamId = teamId
-                        };
-                        rosterEngine.Save(rosterEntry);
-
-                        logger.LogInformation($"Adding Player Stats for {player.PlayerName} to Database");
-                        // Add Player Stats
-                        var stat = playerTransformer.TransformStat(playerEntry);
-                        if (stat != null)
-                        {
-                            stat.PlayerId = player.Id;
-                            stat.ScheduleId = scheduleId;
-                            playerStatEngine.Save(stat);
-                        }
-                        else
-                        {
-                            logger.LogInformation($"{player.PlayerName} did not play");
-                        }
                     }
-                }
-                else
-                {
-                    logger.LogWarning($"Failed to Convert Player: {playerEntry.Name}");
+                    else
+                    {
+                        logger.LogWarning($"Failed to Convert Player: {playerEntry.Name}");
+                    }
                 }
             }
         }
@@ -175,10 +178,13 @@ namespace NbaStats.Loader.Processors
         private void AddTeamStats(int teamId, int oppponentId, long scheduleId, TeamStatCollection stats)
         {
             var stat = teamStatTransformer.Transform(stats);
-            stat.TeamId = teamId;
-            stat.OpponentId = oppponentId;
-            stat.ScheduleId = scheduleId;
-            teamStatEngine.Save(stat);
+            if (stats != null)
+            {
+                stat.TeamId = teamId;
+                stat.OpponentId = oppponentId;
+                stat.ScheduleId = scheduleId;
+                teamStatEngine.Save(stat);
+            }
         }
 
         

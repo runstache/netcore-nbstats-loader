@@ -14,24 +14,27 @@ namespace NbaStats.Loader.Transformers
     {
         public Player Transform(PlayerEntry entry)
         {
-            var player = new Player()
+            if (entry != null)
             {
-                PlayerName = entry.FullName
-            };
-
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] content = Encoding.ASCII.GetBytes(entry.FullName.ToLower().Replace(" ", ""));
-                byte[] hash = md5.ComputeHash(content);
-                StringBuilder code = new StringBuilder();
-                for (int i =0; i < hash.Length; i++)
+                var player = new Player()
                 {
-                    code.Append(hash[i].ToString("X2"));
-                }
-                player.PlayerCode = code.ToString();
-            }
-            return player;
+                    PlayerName = entry.FullName
+                };
 
+                using (MD5 md5 = MD5.Create())
+                {
+                    byte[] content = Encoding.ASCII.GetBytes(entry.FullName.ToLower().Replace(" ", ""));
+                    byte[] hash = md5.ComputeHash(content);
+                    StringBuilder code = new StringBuilder();
+                    for (int i = 0; i < hash.Length; i++)
+                    {
+                        code.Append(hash[i].ToString("X2"));
+                    }
+                    player.PlayerCode = code.ToString();
+                }
+                return player;
+            }
+            return null;
         }
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace NbaStats.Loader.Transformers
         /// <returns>Player Stat</returns>
         public PlayerStat TransformStat(PlayerEntry entry)
         {
-            if (!entry.Stats.Any(s => s.Name.ToLower() == "dnp"))
+            if (entry != null && !entry.Stats.Any(s => s.Name.ToLower() == "dnp"))
             {
                 var stat = new PlayerStat()
                 {

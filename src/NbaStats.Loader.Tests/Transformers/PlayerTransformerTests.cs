@@ -73,5 +73,22 @@ namespace NbaStats.Loader.Tests.Transformers
             Assert.AreEqual(2, playerStat.ThreeTaken);
             Assert.AreEqual(3, playerStat.Turnovers);            
         }
+
+        [Test]
+        public void TestNullPlayer()
+        {
+            var player = transformer.Transform(null);
+            Assert.IsNull(player);
+        }
+
+        [Test]
+        public void TestConvertStatDnp()
+        {
+            entry.Stats.Clear();
+            entry.AddStat(new StatEntry("dnp", "Did not play"));
+
+            var playerStat = transformer.TransformStat(entry);
+            Assert.IsNull(playerStat);
+        }
     }
 }

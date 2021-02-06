@@ -13,26 +13,34 @@ namespace NbaStats.Loader.Transformers
     {
         public Team Transform(TeamEntry entry)
         {
-            return new Team()
+            if (entry != null)
             {
-                TeamCode = entry.Code,
-                TeamName = entry.Name
-            };
+                return new Team()
+                {
+                    TeamCode = entry.Code,
+                    TeamName = entry.Name
+                };
+            }
+            return null;
         }
 
         public BoxScoreEntry TransformBoxScore(TeamEntry entry)
         {
-            var boxscore = new BoxScoreEntry()
+            if (entry != null)
             {
-                Quarter1 = GetLineScoreValue(entry.LineScores, 1),
-                Quarter2 = GetLineScoreValue(entry.LineScores, 2),
-                Quarter3 = GetLineScoreValue(entry.LineScores, 3),
-                Quarter4 = GetLineScoreValue(entry.LineScores, 4)
-            };
+                var boxscore = new BoxScoreEntry()
+                {
+                    Quarter1 = GetLineScoreValue(entry.LineScores, 1),
+                    Quarter2 = GetLineScoreValue(entry.LineScores, 2),
+                    Quarter3 = GetLineScoreValue(entry.LineScores, 3),
+                    Quarter4 = GetLineScoreValue(entry.LineScores, 4)
+                };
 
-            boxscore.Ot = entry.LineScores.Where(c => c.Quarter > 4).Sum(c => c.Score);
-            boxscore.Total = boxscore.Quarter1 + boxscore.Quarter2 + boxscore.Quarter3 + boxscore.Quarter4 + boxscore.Ot;
-            return boxscore;            
+                boxscore.Ot = entry.LineScores.Where(c => c.Quarter > 4).Sum(c => c.Score);
+                boxscore.Total = boxscore.Quarter1 + boxscore.Quarter2 + boxscore.Quarter3 + boxscore.Quarter4 + boxscore.Ot;
+                return boxscore;
+            }
+            return null;
         }
 
         private int GetLineScoreValue(List<LineScore> scores, int quarter)
