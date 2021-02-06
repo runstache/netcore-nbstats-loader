@@ -9,5 +9,6 @@ namespace NbaStats.Loader.Configuration
         public string ConnectionString { get; set; }
         public string ImportDirectory { get; set; }
         public bool ScheduleOnly { get; set; }
+        public string LogFile { get; set; }
     }
 }
