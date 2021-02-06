@@ -8,6 +8,6 @@ namespace NbaStats.Loader.Configuration
     {
         public string ConnectionString { get; set; }
         public string ImportDirectory { get; set; }
-        public bool scheduleOnly { get; set; }
+        public bool ScheduleOnly { get; set; }
     }
 }
