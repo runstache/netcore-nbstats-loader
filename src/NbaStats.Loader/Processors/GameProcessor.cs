@@ -9,6 +9,7 @@ using NbaStats.Loader.Transformers;
 using System.Linq;
 using NbaStats.Loader.Helpers;
 using NbaStats.Loader.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace NbaStats.Loader.Processors
 {
@@ -26,8 +27,9 @@ namespace NbaStats.Loader.Processors
         private readonly IStatEngine<Transaction> transactionEngine;
         private readonly IStatEngine<TeamStat> teamStatEngine;
         private readonly IStatEngine<BoxScoreEntry> boxscoreEngine;
+        private readonly ILogger logger;
 
-        public GameProcessor(IRepository repo, AppSettings settings)
+        public GameProcessor(IRepository repo, AppSettings settings, ILogger logger)
         {
             teamEngine = new TeamEngine(repo);
             scheduleEngine = new ScheduleEntryEngine(repo);
@@ -42,21 +44,26 @@ namespace NbaStats.Loader.Processors
             boxscoreEngine = new BoxScoreEngine(repo);
 
             this.settings = settings;
+            this.logger = logger;
         }
 
         public void Process(GameEntry entry)
         {
+            logger.LogInformation($"Processing Game {entry.Id}");
             var info = entry.Game;
 
             // Add the Teams to the Database
+            
             var homeEntry = info.Teams.Where(c => c.Type.ToLower() == "home").FirstOrDefault();
             var awayEntry = info.Teams.Where(c => c.Type.ToLower() == "away").FirstOrDefault();
+            logger.LogInformation($"Adding Teams {homeEntry.Name} and {awayEntry.Name} to the database");
 
             var home = teamTransformer.Transform(homeEntry);
             var away = teamTransformer.Transform(awayEntry);
 
             if (home != null && away != null)
             {
+
                 home = teamEngine.Save(home);
                 away = teamEngine.Save(away);
 
@@ -66,14 +73,17 @@ namespace NbaStats.Loader.Processors
                     HomeTeamId = home.Id,
                     GameDate = DataTypeHelper.ConvertDateTime(info.Date)
                 };
+                logger.LogInformation($"Adding Schedule for {info.Date}");
                 schedule = scheduleEngine.Save(schedule);
 
-                if (!settings.scheduleOnly && schedule != null)
+                if (!settings.ScheduleOnly && schedule != null)
                 {
+                    logger.LogInformation("Adding Players to Database");
                     // Add the Players
                     AddPlayers(home.Id, schedule.Id, entry.HomePlayers);
                     AddPlayers(away.Id, schedule.Id, entry.AwayPlayers);
 
+                    logger.LogInformation("Adding Team Stats to Database");
                     // Add the Team Stats
                     var homeStats = entry.TeamStats.Where(c => c.Type.ToLower() == "home").FirstOrDefault();
                     var awayStats = entry.TeamStats.Where(c => c.Type.ToLower() == "away").FirstOrDefault();
@@ -81,6 +91,7 @@ namespace NbaStats.Loader.Processors
                     AddTeamStats(home.Id, away.Id, schedule.Id, homeStats);
                     AddTeamStats(away.Id, home.Id, schedule.Id, awayStats);
 
+                    logger.LogInformation("Adding Boxscore to Database");
                     // Add the Boxscore
                     var homeBoxscore = teamTransformer.TransformBoxScore(homeEntry);
                     homeBoxscore.ScheduleId = schedule.Id;
@@ -113,6 +124,7 @@ namespace NbaStats.Loader.Processors
                         // Check for other team roster
                         if (rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).Count() > 0)
                         {
+                            logger.LogInformation($"Player {player.PlayerName} has moved teams.  Adding Transaction.");
                             List<RosterEntry> entries = rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).ToList();
                             foreach (RosterEntry entry in entries)
                             {
@@ -129,6 +141,7 @@ namespace NbaStats.Loader.Processors
                                 rosterEngine.Delete(entry);
                             }
                         }
+                        logger.LogInformation($"Adding player {player.PlayerName} to Team Roster");
                         // Add to the Roster
                         RosterEntry rosterEntry = new RosterEntry()
                         {
@@ -137,12 +150,24 @@ namespace NbaStats.Loader.Processors
                         };
                         rosterEngine.Save(rosterEntry);
 
+                        logger.LogInformation($"Adding Player Stats for {player.PlayerName} to Database");
                         // Add Player Stats
                         var stat = playerTransformer.TransformStat(playerEntry);
-                        stat.PlayerId = player.Id;
-                        stat.ScheduleId = scheduleId;
-                        playerStatEngine.Save(stat);
+                        if (stat != null)
+                        {
+                            stat.PlayerId = player.Id;
+                            stat.ScheduleId = scheduleId;
+                            playerStatEngine.Save(stat);
+                        }
+                        else
+                        {
+                            logger.LogInformation($"{player.PlayerName} did not play");
+                        }
                     }
+                }
+                else
+                {
+                    logger.LogWarning($"Failed to Convert Player: {playerEntry.Name}");
                 }
             }
         }
