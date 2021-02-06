@@ -27,8 +27,6 @@ namespace NbaStats.Loader.Processors
 
         public void Process(InjuryEntry entry)
         {
-            logger.LogInformation("Clearing Injuries");
-            ClearInjuries();
             foreach (InjuredPlayer player in entry.Players)
             {
                 Player p = playerEngine.Query(c => c.PlayerName == player.PlayerName.ToLower()).FirstOrDefault();
@@ -47,15 +45,6 @@ namespace NbaStats.Loader.Processors
                     logger.LogError($"Player {player.PlayerName} does not exist");
                 }
             }            
-        }
-
-        private void ClearInjuries()
-        {
-            List<Injury> injuries = injuryEngine.LoadAll().ToList();
-            foreach (Injury injury in injuries)
-            {
-                injuryEngine.Delete(injury);
-            }
-        }
+        }     
     }
 }

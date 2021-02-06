@@ -8,6 +8,7 @@
     <Product>NBA Stats Database Loader</Product>
     <Description>Loads JSON Data to the Nba Stats Database.</Description>
     <RepositoryUrl>https://github.com/runstache/netcore-nbstats-loader</RepositoryUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
