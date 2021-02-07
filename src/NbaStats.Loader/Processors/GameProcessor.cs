@@ -124,34 +124,35 @@ namespace NbaStats.Loader.Processors
                         if (player != null)
                         {
                             // Check for other team roster
-                            if (rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).Count() > 0)
-                            {
-                                logger.LogInformation($"Player {player.PlayerName} has moved teams.  Adding Transaction.");
-                                List<RosterEntry> entries = rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).ToList();
-                                foreach (RosterEntry entry in entries)
-                                {
-                                    // Add a Transaction
-                                    Transaction transaction = new Transaction()
-                                    {
-                                        NewTeamId = teamId,
-                                        PlayerId = player.Id,
-                                        OldTeamId = entry.TeamId
-                                    };
-                                    transactionEngine.Save(transaction);
-
-                                    // Remove the Entry
-                                    rosterEngine.Delete(entry);
-                                }
-                            }
-                            logger.LogInformation($"Adding player {player.PlayerName} to Team Roster");
-                            // Add to the Roster
                             RosterEntry rosterEntry = new RosterEntry()
                             {
                                 PlayerId = player.Id,
                                 TeamId = teamId
                             };
-                            rosterEngine.Save(rosterEntry);
+                            if (!rosterEngine.Exists(rosterEntry))
+                            {
+                                if (rosterEngine.Query(c => c.PlayerId == player.Id).Count() > 0)
+                                {
+                                    logger.LogInformation($"Player {player.PlayerName} has moved teams.  Adding Transaction.");
+                                    List<RosterEntry> entries = rosterEngine.Query(c => c.PlayerId == player.Id && c.TeamId != teamId).ToList();
+                                    foreach (RosterEntry entry in entries)
+                                    {
+                                        // Add a Transaction
+                                        Transaction transaction = new Transaction()
+                                        {
+                                            NewTeamId = teamId,
+                                            PlayerId = player.Id,
+                                            OldTeamId = entry.TeamId
+                                        };
+                                        transactionEngine.Save(transaction);
 
+                                        // Remove the Entry
+                                        rosterEngine.Delete(entry);
+                                    }
+                                }
+                                logger.LogInformation($"Adding player {player.PlayerName} to Team Roster");
+                                rosterEngine.Save(rosterEntry);
+                            }                                                      
                             logger.LogInformation($"Adding Player Stats for {player.PlayerName} to Database");
                             // Add Player Stats
                             var stat = playerTransformer.TransformStat(playerEntry);

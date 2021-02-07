@@ -35,7 +35,8 @@ namespace NbaStats.Loader.Processors
                     Injury injury = new Injury()
                     {
                         PlayerId = p.Id,
-                        ScratchDate = DataTypeHelper.ConvertDateTime(player.Date)
+                        ScratchDate = DataTypeHelper.ConvertDateTime(player.Date),
+                        InjuryStatus = player.Status
                     };
                     logger.LogInformation($"Adding Injured Player {p.PlayerName}");
                     injuryEngine.Save(injury);
