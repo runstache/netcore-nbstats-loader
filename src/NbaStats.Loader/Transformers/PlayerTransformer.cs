@@ -94,8 +94,8 @@ namespace NbaStats.Loader.Transformers
                     string[] parts = foulShout.Split("-");
                     if (parts.Length > 1)
                     {
-                        stat.FTTaken = DataTypeHelper.ConvertToInteger(parts[0]);
-                        stat.FTCompleted = DataTypeHelper.ConvertToInteger(parts[1]);
+                        stat.FTTaken = DataTypeHelper.ConvertToInteger(parts[1]);
+                        stat.FTCompleted = DataTypeHelper.ConvertToInteger(parts[0]);
 
                         if (stat.FTCompleted > 0 && stat.FTTaken > 0)
                         {
