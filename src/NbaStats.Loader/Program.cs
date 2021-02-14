@@ -12,7 +12,8 @@ using NbaStats.Loader.Configuration;
 using NbaStats.Data.Repositories;
 using NbaStats.Loader.Processors;
 using System.Linq;
-
+using System.Data.SqlClient;
+using System.Data;
 
 namespace NbaStats.Loader
 {
@@ -76,6 +77,30 @@ namespace NbaStats.Loader
             string[] injuryFiles = Directory.GetFiles(settings.ImportDirectory + Path.AltDirectorySeparatorChar + "injuries");
             if (!settings.ScheduleOnly)
             {
+                if (injuryFiles.Length > 0)
+                {
+                    // Clear the Injuries table
+                    SqlConnection conn = new SqlConnection(settings.ConnectionString);
+                    string sqlString = "TRUNCATE TABLE tblInjuries";
+                    SqlCommand comm = new SqlCommand(sqlString, conn);
+                    logger.LogInformation("CLEARING INJURIES");
+                    try
+                    {
+                        conn.Open();
+                        comm.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning("FAILED TO CLEAR INJURIES TABLE", ex);
+                    }
+                    finally
+                    {
+                        conn.Close();
+                        conn.Dispose();
+
+                    }
+                }
+
                 foreach (string injuryFile in injuryFiles)
                 {
                     try
