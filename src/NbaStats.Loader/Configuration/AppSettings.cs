@@ -10,5 +10,6 @@ namespace NbaStats.Loader.Configuration
         public string ImportDirectory { get; set; }
         public bool ScheduleOnly { get; set; }
         public string LogFile { get; set; }
+        public bool RostersOnly { get; set; }
     }
 }

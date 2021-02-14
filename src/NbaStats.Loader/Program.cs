@@ -52,9 +52,9 @@ namespace NbaStats.Loader
             IRepository repo = provider.GetService<IRepository>();
 
             logger.LogInformation("Retrieving Games");
-            List<string> files = Directory.GetFiles(settings.ImportDirectory).ToList();
+            List<string> files = Directory.GetFiles(settings.ImportDirectory + Path.AltDirectorySeparatorChar + "games").ToList();
             files.Sort();
-            foreach (string file in files.Where(c => !c.Contains("injuries")))
+            foreach (string file in files)
             {
                 try
                 {
@@ -73,25 +73,45 @@ namespace NbaStats.Loader
                 }
             }
 
-            string injuryFile = Directory.GetFiles(settings.ImportDirectory).ToList().Where(c => c.Contains("injuries")).FirstOrDefault();
-            if (!string.IsNullOrEmpty(injuryFile) && !settings.ScheduleOnly)
+            string[] injuryFiles = Directory.GetFiles(settings.ImportDirectory + Path.AltDirectorySeparatorChar + "injuries");
+            if (!settings.ScheduleOnly)
             {
-                try
+                foreach (string injuryFile in injuryFiles)
                 {
-                    string json = File.ReadAllText(injuryFile);
-                    IProcessor<InjuryEntry> processor = new InjuryProcessor(repo, logger);
-                    JArray array = JArray.Parse(json);
-                    foreach (JObject obj in array)
+                    try
                     {
-                        InjuryEntry injury = JsonConvert.DeserializeObject<InjuryEntry>(obj.ToString());
-                        processor.Process(injury);
-                    }                    
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError($"Error processing Injuries: {ex.Message}", ex);
+                        string json = File.ReadAllText(injuryFile);
+                        IProcessor<InjuryEntry> processor = new InjuryProcessor(repo, logger);
+                        JArray array = JArray.Parse(json);
+                        foreach (JObject obj in array)
+                        {
+                            InjuryEntry injury = JsonConvert.DeserializeObject<InjuryEntry>(obj.ToString());
+                            processor.Process(injury);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError($"Error processing Injuries: {ex.Message}", ex);
+                    }
                 }
             }
+
+            if (!settings.ScheduleOnly || settings.RostersOnly)
+            {
+                string[] rosters = Directory.GetFiles(settings.ImportDirectory + Path.AltDirectorySeparatorChar + "rosters");
+
+                foreach (string roster in rosters)
+                {
+                    logger.LogInformation($"Processing Roster {roster}");
+                    string json = File.ReadAllText(roster);
+                    RosterItem item = JsonConvert.DeserializeObject<RosterItem>(json);
+                    RosterProcessor rosterProcessor = new RosterProcessor(repo, logger);
+                    rosterProcessor.Process(item);
+
+                    logger.LogInformation($"Finished Processing Roster {roster}");
+                }
+            }
+
             logger.LogInformation("FINISHED.");
             Console.ReadKey();
         }
